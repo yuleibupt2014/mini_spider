@@ -1,7 +1,9 @@
 # mini_spider      __author__ = yulei
 使用python开发一个迷你定向抓取器mini_spider.py，实现对种子链接的广度优先抓取，并把URL长相符合特定pattern的网页保存到磁盘上。
+
 程序运行: 
 python mini_spider.py -c spider.conf 
+
 配置文件spider.conf:
 
 [spider] 
