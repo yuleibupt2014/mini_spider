@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+#coding:gbk
 __author__ = 'yuleibupt2014'
 
 #import argparse
@@ -7,54 +7,56 @@ import ConfigParser
 import getopt,sys
 
 def print_help():
-    print "è¯·æŒ‰ç…§ä»¥ä¸‹æ ¼å¼è¾“å…¥å‚æ•°è¡Œå‘½ä»¤:"
+    print "Çë°´ÕÕÒÔÏÂ¸ñÊ½ÊäÈë²ÎÊıĞĞÃüÁî:"
     print "python mini_spider.py -c spider.conf [-h] [-v]"
-    print "PS:(1)å…¶ä¸­'-c spider.conf'è¡¨ç¤ºä»spider.confæ–‡ä»¶ä¸­è¯»å–é…ç½®ä¿¡æ¯"
-    print "   (2)å…¶ä¸­'-h'è¡¨ç¤ºé˜…è¯»å¸®åŠ©"
-    print "   (3)å…¶ä¸­'-c'è¡¨ç¤ºæ˜¾ç¤ºå½“å‰ç‰ˆæœ¬å·"
+    print "PS:(1)ÆäÖĞ'-c spider.conf'±íÊ¾´Óspider.confÎÄ¼şÖĞ¶ÁÈ¡ÅäÖÃĞÅÏ¢"
+    print "   (2)ÆäÖĞ'-h'±íÊ¾ÔÄ¶Á°ïÖú"
+    print "   (3)ÆäÖĞ'-c'±íÊ¾ÏÔÊ¾µ±Ç°°æ±¾ºÅ"
 
 def print_version():
-    print 'å½“å‰pythonç‰ˆæœ¬å·ä¸º"2.7.9"'
-    print 'å½“å‰spiderç‰ˆæœ¬å·ä¸º"1.0"'
-#è¯»å–é…ç½®æ–‡ä»¶
+    print 'µ±Ç°python°æ±¾ºÅÎª"2.7.9"'
+    print 'µ±Ç°spider°æ±¾ºÅÎª"1.0"'
+#¶ÁÈ¡ÅäÖÃÎÄ¼ş
 def readconfigfile():
     config=ConfigParser.ConfigParser()
     with open("spider.conf","r") as cfgfile:
         config.readfp(cfgfile)
         url_list_file=config.get("spider","url_list_file")
-        output_directory = config.get("spider", "output_directory")  #æŠ“å–ç»“æœå­˜å‚¨ç›®å½•
-        max_depth = config.getint("spider", "max_depth")      #æœ€å¤§æŠ“å–æ·±åº¦(ç§å­ä¸º0çº§)
-        crawl_interval = config.getint("spider", "crawl_interval")     #æŠ“å–é—´éš”. å•ä½: ç§’
-        crawl_timeout = config.getint("spider", "crawl_timeout")    #æŠ“å–è¶…æ—¶. å•ä½: ç§’
-        target_url = config.get("spider", "target_url")        #éœ€è¦å­˜å‚¨çš„ç›®æ ‡ç½‘é¡µURL pattern(æ­£åˆ™è¡¨è¾¾å¼)
-        thread_count = config.getint("spider", 'thread_count')    #æŠ“å–çº¿ç¨‹æ•°
-        print url_list_file
-        print output_directory
-        print max_depth
-        print crawl_interval
-        print crawl_timeout
-        print target_url
-        print thread_count
-#è¯»å‘½ä»¤è¡Œå‚æ•°
+        output_directory = config.get("spider", "output_directory")  #×¥È¡½á¹û´æ´¢Ä¿Â¼
+        max_depth = config.getint("spider", "max_depth")      #×î´ó×¥È¡Éî¶È(ÖÖ×ÓÎª0¼¶)
+        crawl_interval = config.getint("spider", "crawl_interval")     #×¥È¡¼ä¸ô. µ¥Î»: Ãë
+        crawl_timeout = config.getint("spider", "crawl_timeout")    #×¥È¡³¬Ê±. µ¥Î»: Ãë
+        target_url = config.get("spider", "target_url")        #ĞèÒª´æ´¢µÄÄ¿±êÍøÒ³URL pattern(ÕıÔò±í´ïÊ½)
+        thread_count = config.getint("spider", 'thread_count')    #×¥È¡Ïß³ÌÊı
+    return url_list_file,output_directory,max_depth,crawl_interval,crawl_timeout, target_url, thread_count
+#¶ÁÃüÁîĞĞ²ÎÊı
 def readargs():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hvc:")
         for opt,arg in opts:
                 if opt in ("-h", "--help"):
                     print_help()
-                    sys.exit(1)
+                    return "IsFalse"
                 elif opt in ("-v", "--version"):
                     print_version()
-                    sys.exit(1)
+                    return "IsFalse"
+                elif opt=="-c":
+                    if arg=='spider.conf':
+                        print '¶ÁÈ¡ÅäÖÃÎÄ¼ş³É¹¦'
+                        return "IsOK"
+                    else:
+                        print 'ÇëÊäÈë"-c spider.conf"×÷Îª¶ÁÈ¡ÅäÖÃÎÄ¼şÃüÁî'
+                        return "IsFalse"
                 else:
-                    print("%s  ==> %s" %(opt, arg))
-
+                    print  "ÊäÈë¸ñÊ½´íÎó£¬ÇëÖØĞÂÊäÈë£¬¸ü¶àÏêÇéÇëÊäÈë'python mini_spider.py -h'"
+                    return "IsFalse"
     except getopt.GetoptError:
-        print "è¾“å…¥æ ¼å¼é”™è¯¯ï¼Œè¯·é‡æ–°è¾“å…¥ï¼Œæ›´å¤šè¯¦æƒ…è¯·è¾“å…¥'python mini_spider.py -h'"
-        exit
+        print "ÊäÈë¸ñÊ½´íÎó£¬ÇëÖØĞÂÊäÈë£¬¸ü¶àÏêÇéÇëÊäÈë'python mini_spider.py -h'"
+        return "IsFalse"
+
 
 #parser = argparse.ArgumentParser()
-#parser.add_argument("-c", dest="spider.conf", default="spider.conf", help="-C é…ç½®æ–‡ä»¶å")
+#parser.add_argument("-c", dest="spider.conf", default="spider.conf", help="-C ÅäÖÃÎÄ¼şÃû")
 
 #parser.add_argument("-v", type=int, dest="deep", default=1, help="")
 #args = parser.parse_args()
