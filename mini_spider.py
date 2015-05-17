@@ -4,7 +4,7 @@
 
 import argparse
 import spider
-
+import Queue
 
 
 if "__main__" == __name__:
@@ -15,3 +15,17 @@ if "__main__" == __name__:
     elif argflag==None:
         print '请输入命令行参数'
 
+    queueUrl = Queue.Queue()
+    queueHtml = Queue.Queue()
+    queueUrl.put([0,'http://www.sina.com'])
+
+    t = spider.WorkerGetHtml(queueUrl, queueHtml)
+    t.setDaemon(True)
+    t.start()
+
+    t1 = spider.WorkerParserHtml(queueHtml, queueUrl)
+    t1.setDaemon(True)
+    t1.start()
+
+    queueUrl.join()
+    queueHtml.join()

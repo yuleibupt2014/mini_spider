@@ -7,18 +7,50 @@ import StringIO
 import gzip
 import BeautifulSoup
 import re
+import threading
 
-def get_html(url):
-    response = urllib2.urlopen(url, timeout=5)
+class WorkerGetHtml(threading.Thread):
+    def __init__(self, queueUrl, queueHtml):
+        threading.Thread.__init__(self)
+        self.queueUrl = queueUrl
+        self.queueHtml = queueHtml
 
-    if response.info().get('Content-Encoding') == 'gzip':
-        buf = StringIO.StringIO(response.read())
-        f = gzip.GzipFile(fileobj=buf)
-        html = f.read()
-    else:
-        html = response.read()
+    def run(self):
+        while True:
+            url = self.queueUrl.get()
+            print "[get] %s %s" % (url[0], url[1])
+            response = urllib2.urlopen(url[1], timeout=5)
 
-    return html
+            if response.info().get('Content-Encoding') == 'gzip':
+                buf = StringIO(response.read())
+                f = gzip.GzipFile(fileobj=buf)
+                html = f.read()
+            else:
+                html = response.read()
+
+            self.queueHtml.put([url[0], html])
+            self.queueUrl.task_done()
+
+class WorkerParserHtml(threading.Thread):
+    def __init__(self, queueHtml, queueUrl):
+        threading.Thread.__init__(self)
+        self.queueHtml = queueHtml
+        self.queueUrl = queueUrl
+
+    def run(self):
+        while True:
+            html = self.queueHtml.get()
+            deep = html[0] + 1
+            soup = BeautifulSoup.BeautifulSoup(html[1])
+            count = 0
+            for link in soup.findAll('a', attrs={'href': re.compile("^http://")}):
+                href = link.get('href')
+                count = count + 1
+                self.queueUrl.put([deep, href])
+                print "[href] %s %s" % (deep, href)
+            print count
+            self.queueHtml.task_done()
+
 
 def save_html(data):
     fp = open("a.html","w+")
@@ -27,16 +59,4 @@ def save_html(data):
 def print_html(data):
     print data
 
-def get_link(html):   #得到HTML里面的所有网页链接
-    new_link = []
-    soup = BeautifulSoup.BeautifulSoup(html)
-    for link in soup.findAll('a', attrs={'href': re.compile("^http://")}):
-        new_link.append(link.get('href'))
-    return new_link
 
-def print_link(link_array):     #打印出从HTML得到的所有网页链接
-    for link in link_array:
-        print link
-    print len(link_array)
-
-print_link(get_link(get_html("http://www.sina.com")))
