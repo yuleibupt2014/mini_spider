@@ -7,7 +7,7 @@ import spider
 import Queue
 import os,sys
 import md5
-
+import time
 ####################################################################
 url_list_file= 'C:\Users\yuleibupt2014\Desktop\mini_spider\urls'    #种子文件路径
 output_directory='C:\Users\yuleibupt2014\Desktop\mini_spider\output' #抓取结果存储目录
@@ -27,7 +27,7 @@ def main():
         print '请输入命令行参数'
 
     queueUrl = Queue.Queue()
-    dict_url = {}
+    dict_downloaded = {}
 
     urlfile=open(str(url_list_file),'r')       #读种子文件
     for website in urlfile.readlines():
@@ -39,16 +39,18 @@ def main():
     #     htmlname="http://"+srcfilename
     #     print htmlname
     #     url_hash = md5.new(str(htmlname)).hexdigest()
-    #     dict_url[url_hash] = str(htmlname)
-    #print dict_url
+    #     dict_downloaded[url_hash] = str(htmlname)
+    #print dict_downloaded
 
     for i in range(thread_count):
-        t = spider.WorkerGetHtml(queueUrl,dict_url,max_depth)
+        t = spider.WorkerGetHtml(queueUrl,dict_downloaded,max_depth)
         t.setDaemon(True)
         t.start()
-
+    thread_log = spider.PrintLog(queueUrl, dict_downloaded)
+    thread_log.setDaemon(True)
+    thread_log.start()
     queueUrl.join()
-    print len(dict_url)
+    print "downloaded: {0} Elapsed Time: {1}".format(len(dict_downloaded), time.time())
 
 if __name__=='__main__':
     main()
